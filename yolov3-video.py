@@ -3,9 +3,15 @@ import cv2
 import onnxruntime
 import numpy as np
 
-session = onnxruntime.InferenceSession("yolov3.onnx")
+font2 = cv2.FONT_HERSHEY_SIMPLEX
+fontScale = 0.5
+thickness = 1
+
+session = onnxruntime.InferenceSession("yolov3-10.onnx")
 inname = [input.name for input in session.get_inputs()]
 outname = [output.name for output in session.get_outputs()]
+
+
 
 def frame_process(frame, input_shape=(416, 416)):
     image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -44,7 +50,7 @@ label =["person","bicycle","car","motorbike","aeroplane","bus","train","truck","
     "laptop","mouse","remote","keyboard","cell phone","microwave","oven","toaster","sink",
     "refrigerator","book","clock","vase","scissors","teddy bear","hair drier","toothbrush"]
 
-cap = cv2.VideoCapture('road.mp4')
+cap = cv2.VideoCapture('/home/mohan/git/backups/drive.mp4')
 sum_time = 0
 sum_frame = 0
 while (cap.isOpened()):
@@ -58,11 +64,30 @@ while (cap.isOpened()):
         out_boxes = np.array(out_boxes).tolist()
         out_scores = np.array(out_scores).tolist()
         out_classes = np.array(out_classes).tolist()
-        
+
         for i, c in reversed(list(enumerate(out_classes))):
-            print("box:", out_boxes[i])
-            print("score:", out_scores[i],",", label[c])
-        print("\n")
+            predicted_class = label[c]
+            box = out_boxes[i]
+            score = out_scores[i]
+            label = '{} {:.2f}'.format(predicted_class, score)
+
+            top, left, bottom, right = box
+            top = max(0, np.floor(top + 0.5).astype('int32'))
+            left = max(0, np.floor(left + 0.5).astype('int32'))
+            bottom = int(bottom)
+            right = int(right)
+
+            cv2.rectangle(frame, (left, top), (right, bottom), color=(0, 255, 0), thickness=2)
+            cv2.putText(frame, label, (left, top), font2, fontScale, color=(255, 255, 0), thickness=2)
+        #cv2.imshow('im', frame)
+        #if cv2.waitKey(0) & 0xFF == ord('q'):
+        #    cv2.destroyAllWindows()
+        #    break
+        
+        #for i, c in reversed(list(enumerate(out_classes))):
+        #    print("box:", out_boxes[i])
+        #    print("score:", out_scores[i],",", label[c])
+        #print("\n")
 
     else:
         print("-------------------------------------------------")
