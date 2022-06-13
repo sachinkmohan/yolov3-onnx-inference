@@ -33,7 +33,7 @@ def get_prediction(image_data, image_size):
     t0 = time.time()
     boxes, scores, indices = session.run(outname, input)
     predict_time = time.time() - t0
-    print("Predict Time: %ss" % (predict_time))
+    #print("Predict Time: %ss" % (predict_time))
     out_boxes, out_scores, out_classes = [], [], []
     for idx_ in indices:
         out_classes.append(idx_[1])
@@ -90,7 +90,10 @@ label =["person","bicycle","car","motorbike","aeroplane","bus","train","truck","
 cap = cv2.VideoCapture('untitled2.mp4')
 sum_time = 0
 sum_frame = 0
+prev_frame_time = 0
+new_frame_time = 0
 while (cap.isOpened()):
+    new_frame_time = time.time()
     ret, frame = cap.read()
     if ret == True:
         #image_data = frame_process(frame, input_shape=(416, 416))
@@ -99,6 +102,11 @@ while (cap.isOpened()):
         image_data = preprocess(pil_img)
         image_size = np.array([416, 416], dtype=np.float32).reshape(1, 2)
         out_boxes, out_scores, out_classes, predict_time = get_prediction(image_data, image_size)
+        fps = 1/(new_frame_time - prev_frame_time)
+        prev_frame_time = new_frame_time
+        # converting the fps into integer
+        fps = int(fps)
+        print(fps)
         sum_time += predict_time
         sum_frame += 1
         out_boxes = np.array(out_boxes).tolist()
@@ -107,7 +115,7 @@ while (cap.isOpened()):
 
         for i, c in reversed(list(enumerate(out_classes))):
             a = list(enumerate(out_classes))
-            print(c)
+            #print(c)
             predicted_class = label[c]
             box = out_boxes[i]
             score = out_scores[i]
