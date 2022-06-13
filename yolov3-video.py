@@ -111,7 +111,7 @@ while (cap.isOpened()):
             predicted_class = label[c]
             box = out_boxes[i]
             score = out_scores[i]
-            label = '{} {:.2f}'.format(predicted_class, score)
+            label2= '{} {:.2f}'.format(predicted_class, score)
 
             top, left, bottom, right = box
             top = max(0, np.floor(top + 0.5).astype('int32'))
@@ -120,7 +120,7 @@ while (cap.isOpened()):
             right = int(right)
 
             cv2.rectangle(resized, (left, top), (right, bottom), color=(0, 255, 0), thickness=2)
-            cv2.putText(resized, label, (left, top), font2, fontScale, color=(255, 255, 0), thickness=2)
+            cv2.putText(resized, label2, (left, top), font2, fontScale, color=(255, 255, 0), thickness=2)
         cv2.imshow('im', resized)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             cv2.destroyAllWindows()

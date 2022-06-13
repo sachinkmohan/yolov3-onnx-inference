@@ -3,7 +3,7 @@ import onnxruntime
 import numpy as np
 from PIL import Image
 
-session = onnxruntime.InferenceSession("yolov3-10.onnx")
+session = onnxruntime.InferenceSession("yolov3-10.onnx", providers=['CUDAExecutionProvider'])
 inname = [input.name for input in session.get_inputs()]
 outname = [output.name for output in session.get_outputs()]
 
@@ -55,6 +55,7 @@ label =["person","bicycle","car","motorbike","aeroplane","bus","train","truck","
     "refrigerator","book","clock","vase","scissors","teddy bear","hair drier","toothbrush"]
 
 image = Image.open("kite.jpg")
+print(type(image))
 image_data = preprocess(image)
 image_size = np.array([image.size[1], image.size[0]], dtype=np.float32).reshape(1, 2)
 out_boxes, out_scores, out_classes = get_prediction(image_data, image_size)
